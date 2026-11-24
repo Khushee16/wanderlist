@@ -1,35 +1,14 @@
-/* ============ Wanderlist — destination explorer ============ */
+/* ============ Wanderlist — destination explorer ============
+   Data: bundled copy in destinations-data.js. When a PHP backend is
+   available the list is loaded from destinations.php instead (same data);
+   on static hosting (GitHub Pages / file://) the fetch fails and the
+   bundled copy is used, so the explorer always works. */
 (function () {
   "use strict";
 
-  var DESTINATIONS = [
-    { id: "kyoto", name: "Kyoto", country: "Japan", region: "Asia", rating: 4.9, price: 1450, days: "7 days", seed: "kyoto-japan",
-      desc: "Ancient temples, bamboo groves, and tea houses — Kyoto is Japan's cultural heart, best explored slowly on foot and by quiet morning visits to its famous shrines." },
-    { id: "santorini", name: "Santorini", country: "Greece", region: "Europe", rating: 4.8, price: 1680, days: "5 days", seed: "santorini-greece",
-      desc: "Whitewashed villages clinging to volcanic cliffs above a sapphire caldera. Come for the sunsets in Oia, stay for the volcanic beaches and Assyrtiko wine." },
-    { id: "banff", name: "Banff", country: "Canada", region: "Americas", rating: 4.7, price: 1320, days: "6 days", seed: "banff-canada",
-      desc: "Turquoise lakes, towering peaks, and more wildlife than people. Hike Johnston Canyon, soak in the hot springs, and drive the unforgettable Icefields Parkway." },
-    { id: "marrakech", name: "Marrakech", country: "Morocco", region: "Africa", rating: 4.6, price: 980, days: "5 days", seed: "marrakech-morocco",
-      desc: "A sensory overload in the best way — spice markets, mosaic courtyards, and rooftop sunsets over the Atlas Mountains. Don't skip the Jardin Majorelle." },
-    { id: "queenstown", name: "Queenstown", country: "New Zealand", region: "Oceania", rating: 4.9, price: 1740, days: "8 days", seed: "queenstown-nz",
-      desc: "The adventure capital of the Southern Hemisphere. Bungy jump at dawn, cruise Milford Sound by afternoon, and end the day with Fergburger by the lake." },
-    { id: "amalfi", name: "Amalfi Coast", country: "Italy", region: "Europe", rating: 4.8, price: 1890, days: "6 days", seed: "amalfi-italy",
-      desc: "Lemon groves, cliffside villages, and the bluest water in Europe. Base yourself in Positano or Praiano and boat-hop between coastal towns." },
-    { id: "bali", name: "Bali", country: "Indonesia", region: "Asia", rating: 4.7, price: 1120, days: "9 days", seed: "bali-indonesia",
-      desc: "Emerald rice terraces, temple ceremonies, and surf breaks for every level. Ubud for culture, Uluwatu for cliffs, and Canggu for the digital-nomad buzz." },
-    { id: "reykjavik", name: "Reykjavik", country: "Iceland", region: "Europe", rating: 4.8, price: 1560, days: "5 days", seed: "reykjavik-iceland",
-      desc: "Chase waterfalls along the Golden Circle, bathe in geothermal lagoons, and — between September and March — hunt the northern lights." },
-    { id: "patagonia", name: "Patagonia", country: "Chile", region: "Americas", rating: 4.9, price: 1980, days: "10 days", seed: "patagonia-chile",
-      desc: "Granite towers, calving glaciers, and the famous W trek through Torres del Paine. Raw, remote, and unlike anywhere else on Earth." },
-    { id: "capetown", name: "Cape Town", country: "South Africa", region: "Africa", rating: 4.6, price: 1240, days: "7 days", seed: "capetown-sa",
-      desc: "Table Mountain, penguin beaches, and world-class wine country an hour away. One of the most scenically complete cities on the planet." },
-    { id: "sydney", name: "Sydney", country: "Australia", region: "Oceania", rating: 4.5, price: 1610, days: "6 days", seed: "sydney-australia",
-      desc: "Harbour icons, coastal walks from Bondi to Coogee, and a food scene that punches far above its weight. Easy, sunny, and endlessly walkable." },
-    { id: "cusco", name: "Cusco", country: "Peru", region: "Americas", rating: 4.7, price: 1050, days: "7 days", seed: "cusco-peru",
-      desc: "The gateway to Machu Picchu — but give Cusco itself time. Inca stonework, vibrant markets, and high-altitude adventure in the Sacred Valley." }
-  ];
-
-  var REGIONS = ["All", "Europe", "Asia", "Americas", "Africa", "Oceania"];
+  var FALLBACK = window.WANDERLIST_DESTINATIONS || [];
+  var REGIONS = window.WANDERLIST_REGIONS || ["All", "Europe", "Asia", "Americas", "Africa", "Oceania"];
+  var DESTINATIONS = FALLBACK.slice();
 
   var state = { q: "", region: "All", sort: "rating-desc", favOnly: false, favorites: loadFavorites() };
 
@@ -44,6 +23,21 @@
   var backdrop = document.getElementById("modalBackdrop");
   var modalClose = document.getElementById("modalClose");
   var currentModalId = null;
+
+  /* Try the PHP backend first; fall back silently to the bundled data. */
+  function loadFromBackend() {
+    if (!/^https?:/.test(window.location.protocol)) return Promise.resolve(false);
+    return fetch("destinations.php", { headers: { "Accept": "application/json" } })
+      .then(function (res) { if (!res.ok) throw new Error("backend " + res.status); return res.json(); })
+      .then(function (data) {
+        if (data && data.ok && Array.isArray(data.destinations) && data.destinations.length) {
+          DESTINATIONS = data.destinations;
+          return true;
+        }
+        return false;
+      })
+      .catch(function () { return false; });
+  }
 
   function loadFavorites() {
     try {
@@ -82,6 +76,7 @@
   }
 
   function renderPills() {
+    if (!regionPills) return;
     regionPills.innerHTML = "";
     REGIONS.forEach(function (r) {
       var btn = document.createElement("button");
@@ -140,16 +135,21 @@
     rating.textContent = stars(d.rating);
     var price = document.createElement("span");
     price.className = "price";
-    price.innerHTML = "";
     price.appendChild(document.createTextNode("$" + d.price.toLocaleString()));
     var small = document.createElement("small");
     small.textContent = " est.";
     price.appendChild(small);
     foot.appendChild(rating);
     foot.appendChild(price);
+    var link = document.createElement("a");
+    link.className = "card-link";
+    link.href = "destination.html?id=" + encodeURIComponent(d.id);
+    link.textContent = "View details \u2192";
+    link.addEventListener("click", function (e) { e.stopPropagation(); });
     body.appendChild(h3);
     body.appendChild(country);
     body.appendChild(foot);
+    body.appendChild(link);
 
     card.appendChild(wrap);
     card.appendChild(body);
@@ -163,6 +163,7 @@
   }
 
   function render() {
+    if (!grid) return;
     var list = getFiltered();
     grid.innerHTML = "";
     list.forEach(function (d, i) {
@@ -170,10 +171,10 @@
       c.style.animationDelay = Math.min(i * 40, 400) + "ms";
       grid.appendChild(c);
     });
-    resultCount.textContent = list.length === 1
-      ? "1 destination"
-      : list.length + " destinations";
-    emptyState.hidden = list.length !== 0;
+    if (resultCount) {
+      resultCount.textContent = list.length === 1 ? "1 destination" : list.length + " destinations";
+    }
+    if (emptyState) emptyState.hidden = list.length !== 0;
   }
 
   function toggleFavorite(id) {
@@ -193,7 +194,7 @@
 
   function openModal(id) {
     var d = findDest(id);
-    if (!d) return;
+    if (!d || !backdrop) return;
     currentModalId = id;
     document.getElementById("modalImg").src = imgUrl(d.seed, 900, 506);
     document.getElementById("modalImg").alt = d.name + ", " + d.country;
@@ -204,58 +205,128 @@
     document.getElementById("modalDays").textContent = "Suggested: " + d.days;
     document.getElementById("modalDesc").textContent = d.desc;
     document.getElementById("modalPrice").textContent = "$" + d.price.toLocaleString();
+    var detailLink = document.getElementById("modalDetailLink");
+    if (detailLink) detailLink.href = "destination.html?id=" + encodeURIComponent(d.id);
     syncModalFav(id);
     backdrop.hidden = false;
     document.body.style.overflow = "hidden";
-    modalClose.focus();
+    if (modalClose) modalClose.focus();
   }
   function syncModalFav(id) {
     var btn = document.getElementById("modalFav");
+    if (!btn) return;
     btn.classList.toggle("active", state.favorites.has(id));
     var d = findDest(id);
     btn.setAttribute("aria-label", (state.favorites.has(id) ? "Remove " : "Save ") + (d ? d.name : "") + " favorites");
   }
   function closeModal() {
+    if (!backdrop) return;
     backdrop.hidden = true;
     document.body.style.overflow = "";
     currentModalId = null;
   }
 
-  document.getElementById("modalFav").addEventListener("click", function () {
+  var modalFavBtn = document.getElementById("modalFav");
+  if (modalFavBtn) modalFavBtn.addEventListener("click", function () {
     if (currentModalId) toggleFavorite(currentModalId);
   });
-  modalClose.addEventListener("click", closeModal);
-  backdrop.addEventListener("click", function (e) {
+  if (modalClose) modalClose.addEventListener("click", closeModal);
+  if (backdrop) backdrop.addEventListener("click", function (e) {
     if (e.target === backdrop) closeModal();
   });
   document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape" && !backdrop.hidden) closeModal();
+    if (e.key === "Escape" && backdrop && !backdrop.hidden) closeModal();
   });
 
-  searchInput.addEventListener("input", function () {
+  if (searchInput) searchInput.addEventListener("input", function () {
     state.q = searchInput.value;
     render();
   });
-  sortSelect.addEventListener("change", function () {
+  if (sortSelect) sortSelect.addEventListener("change", function () {
     state.sort = sortSelect.value;
     render();
   });
-  favOnly.addEventListener("change", function () {
+  if (favOnly) favOnly.addEventListener("change", function () {
     state.favOnly = favOnly.checked;
     render();
   });
-  clearFilters.addEventListener("click", function () {
+  if (clearFilters) clearFilters.addEventListener("click", function () {
     state.q = "";
     state.region = "All";
     state.sort = "rating-desc";
     state.favOnly = false;
-    searchInput.value = "";
-    sortSelect.value = "rating-desc";
-    favOnly.checked = false;
+    if (searchInput) searchInput.value = "";
+    if (sortSelect) sortSelect.value = "rating-desc";
+    if (favOnly) favOnly.checked = false;
     renderPills();
     render();
   });
 
+  /* ---------- Newsletter signup: POST to subscribe.php ----------
+     On static hosting there is no PHP backend, so a failed fetch shows a
+     clearly-labelled DEMO success state instead of pretending to subscribe. */
+  var newsForm = document.getElementById("newsForm");
+  var newsEmail = document.getElementById("newsEmail");
+  var newsMsg = document.getElementById("newsMsg");
+  var newsDemo = document.getElementById("newsDemoNote");
+  var newsBtn = document.getElementById("newsSubmit");
+  if (newsForm && newsEmail) {
+    newsForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var email = newsEmail.value.trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+        if (newsMsg) { newsMsg.textContent = "Please enter a valid email address."; newsMsg.className = "news-msg error"; }
+        if (newsDemo) newsDemo.hidden = true;
+        newsEmail.focus();
+        return;
+      }
+      if (newsBtn) { newsBtn.disabled = true; newsBtn.textContent = "Subscribing…"; }
+      fetch("subscribe.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email })
+      })
+        .then(function (res) {
+          if (!res.ok) throw new Error("backend unavailable (" + res.status + ")");
+          return res.json();
+        })
+        .then(function (data) {
+          if (data && data.ok) {
+            if (newsMsg) { newsMsg.textContent = data.duplicate ? "You're already on the list — welcome back!" : "You're in! Watch your inbox for travel ideas."; newsMsg.className = "news-msg"; }
+            if (newsDemo) newsDemo.hidden = true;
+            newsForm.reset();
+          } else {
+            throw new Error("backend rejected signup");
+          }
+        })
+        .catch(function () {
+          if (newsMsg) { newsMsg.textContent = "Thanks — demo mode: no backend connected, so this signup wasn't saved anywhere."; newsMsg.className = "news-msg"; }
+          if (newsDemo) newsDemo.hidden = false;
+        })
+        .finally(function () {
+          if (newsBtn) { newsBtn.disabled = false; newsBtn.textContent = "Subscribe"; }
+        });
+    });
+  }
+
+  /* ---------- Scroll reveal ---------- */
+  function initReveal() {
+    var els = document.querySelectorAll(".reveal");
+    if (!els.length) return;
+    if ("IntersectionObserver" in window) {
+      var obs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) { entry.target.classList.add("visible"); obs.unobserve(entry.target); }
+        });
+      }, { threshold: 0.12 });
+      els.forEach(function (el) { obs.observe(el); });
+    } else {
+      els.forEach(function (el) { el.classList.add("visible"); });
+    }
+  }
+
   renderPills();
   render();
+  initReveal();
+  loadFromBackend().then(function (changed) { if (changed) { renderPills(); render(); } });
 })();

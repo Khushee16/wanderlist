@@ -1,0 +1,194 @@
+[
+  {
+    "id": "kyoto",
+    "name": "Kyoto",
+    "country": "Japan",
+    "region": "Asia",
+    "rating": 4.9,
+    "price": 1450,
+    "days": "7 days",
+    "seed": "kyoto-japan",
+    "desc": "Ancient temples, bamboo groves, and tea houses — Kyoto is Japan's cultural heart, best explored slowly on foot and by quiet morning visits to its famous shrines.",
+    "highlights": [
+      "Fushimi Inari's thousand vermilion gates",
+      "Arashiyama bamboo grove at sunrise",
+      "Tea ceremony in a Gion machiya"
+    ]
+  },
+  {
+    "id": "santorini",
+    "name": "Santorini",
+    "country": "Greece",
+    "region": "Europe",
+    "rating": 4.8,
+    "price": 1680,
+    "days": "5 days",
+    "seed": "santorini-greece",
+    "desc": "Whitewashed villages clinging to volcanic cliffs above a sapphire caldera. Come for the sunsets in Oia, stay for the volcanic beaches and Assyrtiko wine.",
+    "highlights": [
+      "Sunset over the caldera in Oia",
+      "Black-sand beach at Kamari",
+      "Wine tasting in Santo Wines"
+    ]
+  },
+  {
+    "id": "banff",
+    "name": "Banff",
+    "country": "Canada",
+    "region": "Americas",
+    "rating": 4.7,
+    "price": 1320,
+    "days": "6 days",
+    "seed": "banff-canada",
+    "desc": "Turquoise lakes, towering peaks, and more wildlife than people. Hike Johnston Canyon, soak in the hot springs, and drive the unforgettable Icefields Parkway.",
+    "highlights": [
+      "Canoe on Lake Louise at dawn",
+      "Johnston Canyon catwalks",
+      "Banff Upper Hot Springs"
+    ]
+  },
+  {
+    "id": "marrakech",
+    "name": "Marrakech",
+    "country": "Morocco",
+    "region": "Africa",
+    "rating": 4.6,
+    "price": 980,
+    "days": "5 days",
+    "seed": "marrakech-morocco",
+    "desc": "A sensory overload in the best way — spice markets, mosaic courtyards, and rooftop sunsets over the Atlas Mountains. Don't skip the Jardin Majorelle.",
+    "highlights": [
+      "Jemaa el-Fnaa at dusk",
+      "Jardin Majorelle",
+      "Day trip to the Atlas Mountains"
+    ]
+  },
+  {
+    "id": "queenstown",
+    "name": "Queenstown",
+    "country": "New Zealand",
+    "region": "Oceania",
+    "rating": 4.9,
+    "price": 1740,
+    "days": "8 days",
+    "seed": "queenstown-nz",
+    "desc": "The adventure capital of the Southern Hemisphere. Bungy jump at dawn, cruise Milford Sound by afternoon, and end the day with Fergburger by the lake.",
+    "highlights": [
+      "Milford Sound cruise",
+      "Bungy jump at Kawarau Bridge",
+      "Lake Wakatipu lakeside walk"
+    ]
+  },
+  {
+    "id": "amalfi",
+    "name": "Amalfi Coast",
+    "country": "Italy",
+    "region": "Europe",
+    "rating": 4.8,
+    "price": 1890,
+    "days": "6 days",
+    "seed": "amalfi-italy",
+    "desc": "Lemon groves, cliffside villages, and the bluest water in Europe. Base yourself in Positano or Praiano and boat-hop between coastal towns.",
+    "highlights": [
+      "Boat day to hidden coves",
+      "Path of the Gods hike",
+      "Limoncello tasting in Amalfi town"
+    ]
+  },
+  {
+    "id": "bali",
+    "name": "Bali",
+    "country": "Indonesia",
+    "region": "Asia",
+    "rating": 4.7,
+    "price": 1120,
+    "days": "9 days",
+    "seed": "bali-indonesia",
+    "desc": "Emerald rice terraces, temple ceremonies, and surf breaks for every level. Ubud for culture, Uluwatu for cliffs, and Canggu for the digital-nomad buzz.",
+    "highlights": [
+      "Tegalalang rice terraces",
+      "Uluwatu Temple sunset",
+      "Snorkelling at Nusa Penida"
+    ]
+  },
+  {
+    "id": "reykjavik",
+    "name": "Reykjavik",
+    "country": "Iceland",
+    "region": "Europe",
+    "rating": 4.8,
+    "price": 1560,
+    "days": "5 days",
+    "seed": "reykjavik-iceland",
+    "desc": "Chase waterfalls along the Golden Circle, bathe in geothermal lagoons, and — between September and March — hunt the northern lights.",
+    "highlights": [
+      "Golden Circle waterfalls",
+      "Blue Lagoon geothermal spa",
+      "Northern lights hunt (Sep–Mar)"
+    ]
+  },
+  {
+    "id": "patagonia",
+    "name": "Patagonia",
+    "country": "Chile",
+    "region": "Americas",
+    "rating": 4.9,
+    "price": 1980,
+    "days": "10 days",
+    "seed": "patagonia-chile",
+    "desc": "Granite towers, calving glaciers, and the famous W trek through Torres del Paine. Raw, remote, and unlike anywhere else on Earth.",
+    "highlights": [
+      "W trek in Torres del Paine",
+      "Grey Glacier kayaking",
+      "Guanaco spotting on the pampas"
+    ]
+  },
+  {
+    "id": "capetown",
+    "name": "Cape Town",
+    "country": "South Africa",
+    "region": "Africa",
+    "rating": 4.6,
+    "price": 1240,
+    "days": "7 days",
+    "seed": "capetown-sa",
+    "desc": "Table Mountain, penguin beaches, and world-class wine country an hour away. One of the most scenically complete cities on the planet.",
+    "highlights": [
+      "Table Mountain cable car",
+      "Penguins at Boulders Beach",
+      "Stellenbosch wine route"
+    ]
+  },
+  {
+    "id": "sydney",
+    "name": "Sydney",
+    "country": "Australia",
+    "region": "Oceania",
+    "rating": 4.5,
+    "price": 1610,
+    "days": "6 days",
+    "seed": "sydney-australia",
+    "desc": "Harbour icons, coastal walks from Bondi to Coogee, and a food scene that punches far above its weight. Easy, sunny, and endlessly walkable.",
+    "highlights": [
+      "Bondi to Coogee coastal walk",
+      "Sydney Harbour ferry at sunset",
+      "Blue Mountains day trip"
+    ]
+  },
+  {
+    "id": "cusco",
+    "name": "Cusco",
+    "country": "Peru",
+    "region": "Americas",
+    "rating": 4.7,
+    "price": 1050,
+    "days": "7 days",
+    "seed": "cusco-peru",
+    "desc": "The gateway to Machu Picchu — but give Cusco itself time. Inca stonework, vibrant markets, and high-altitude adventure in the Sacred Valley.",
+    "highlights": [
+      "Machu Picchu by train",
+      "Sacsayhuamán ruins",
+      "Sacred Valley markets"
+    ]
+  }
+]
