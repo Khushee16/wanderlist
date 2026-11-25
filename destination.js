@@ -63,6 +63,7 @@
       var isFav = favorites.has(d.id);
       favBtn.textContent = isFav ? "\u2764 Saved to favorites" : "\u2661 Save to favorites";
       favBtn.classList.toggle("active", isFav);
+      favBtn.setAttribute("aria-pressed", isFav ? "true" : "false");
     }
     favBtn.addEventListener("click", function () {
       if (favorites.has(d.id)) favorites.delete(d.id);
@@ -108,12 +109,31 @@
       body.appendChild(link);
       card.appendChild(wrap);
       card.appendChild(body);
+      card.setAttribute("tabindex", "0");
+      card.setAttribute("role", "link");
+      card.setAttribute("aria-label", "View details for " + r.name);
       card.addEventListener("click", function () { window.location.href = link.href; });
+      card.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); window.location.href = link.href; }
+      });
       col.appendChild(card);
       relGrid.appendChild(col);
     });
 
     document.getElementById("destContent").hidden = false;
+    /* Reveal-on-scroll for the freshly rendered sections */
+    var revealTargets = document.querySelectorAll(".dest-hero, .dest-main, .dest-card, .related");
+    revealTargets.forEach(function (el) { el.classList.add("reveal"); });
+    if ("IntersectionObserver" in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) { entry.target.classList.add("visible"); io.unobserve(entry.target); }
+        });
+      }, { threshold: 0.1 });
+      revealTargets.forEach(function (el) { io.observe(el); });
+    } else {
+      revealTargets.forEach(function (el) { el.classList.add("visible"); });
+    }
   }
 
   function showNotFound(id) {

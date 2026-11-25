@@ -19,6 +19,7 @@
   -->
 </head>
 <body>
+  <a class="skip-link" href="#main">Skip to main content</a>
   <header class="site-header">
     <div class="container nav-inner">
       <a href="index.html" class="logo">
@@ -38,7 +39,7 @@
     </div>
   </header>
 
-  <main class="container">
+  <main class="container" id="main">
     <a href="index.html" class="back-link">&larr; Back to all destinations</a>
 
     <div id="destContent" hidden>
@@ -64,7 +65,7 @@
             <div><span>Rating</span><strong id="destRating"></strong></div>
             <div><span>Suggested length</span><strong id="destDays"></strong></div>
           </div>
-          <button class="btn" id="destFav" type="button">&#9825; Save to favorites</button>
+          <button class="btn" id="destFav" type="button" aria-pressed="false">&#9825; Save to favorites</button>
           <a href="index.html" class="btn btn-ghost" style="margin-top: 10px;">Browse more trips</a>
         </aside>
       </div>

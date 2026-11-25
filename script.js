@@ -23,6 +23,7 @@
   var backdrop = document.getElementById("modalBackdrop");
   var modalClose = document.getElementById("modalClose");
   var currentModalId = null;
+  var lastOpener = null;
 
   /* Try the PHP backend first; fall back silently to the bundled data. */
   function loadFromBackend() {
@@ -113,8 +114,10 @@
     fav.className = "fav-btn" + (state.favorites.has(d.id) ? " active" : "");
     fav.innerHTML = "&#10084;";
     fav.setAttribute("aria-label", "Save " + d.name + " to favorites");
+    fav.setAttribute("aria-pressed", state.favorites.has(d.id) ? "true" : "false");
     fav.addEventListener("click", function (e) {
       e.stopPropagation();
+      fav.classList.remove("pop"); void fav.offsetWidth; fav.classList.add("pop");
       toggleFavorite(d.id);
     });
     wrap.appendChild(img);
@@ -208,6 +211,7 @@
     var detailLink = document.getElementById("modalDetailLink");
     if (detailLink) detailLink.href = "destination.html?id=" + encodeURIComponent(d.id);
     syncModalFav(id);
+    lastOpener = document.activeElement;
     backdrop.hidden = false;
     document.body.style.overflow = "hidden";
     if (modalClose) modalClose.focus();
@@ -218,12 +222,14 @@
     btn.classList.toggle("active", state.favorites.has(id));
     var d = findDest(id);
     btn.setAttribute("aria-label", (state.favorites.has(id) ? "Remove " : "Save ") + (d ? d.name : "") + " favorites");
+    btn.setAttribute("aria-pressed", state.favorites.has(id) ? "true" : "false");
   }
   function closeModal() {
     if (!backdrop) return;
     backdrop.hidden = true;
     document.body.style.overflow = "";
     currentModalId = null;
+    if (lastOpener && document.contains(lastOpener)) lastOpener.focus();
   }
 
   var modalFavBtn = document.getElementById("modalFav");
@@ -236,6 +242,13 @@
   });
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape" && backdrop && !backdrop.hidden) closeModal();
+    if (e.key === "Tab" && backdrop && !backdrop.hidden) {
+      var focusables = backdrop.querySelectorAll("button, a[href]");
+      if (!focusables.length) return;
+      var first = focusables[0], last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
   });
 
   if (searchInput) searchInput.addEventListener("input", function () {
@@ -329,4 +342,40 @@
   render();
   initReveal();
   loadFromBackend().then(function (changed) { if (changed) { renderPills(); render(); } });
+})();
+
+
+/* === Polish pass 2026-11-25: scroll progress, back-to-top, reveal stagger, search shortcuts === */
+(function () {
+  "use strict";
+  var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var bar = document.createElement("div");
+  bar.className = "scroll-progress"; bar.setAttribute("aria-hidden", "true");
+  document.body.appendChild(bar);
+  var topBtn = document.createElement("button");
+  topBtn.className = "back-to-top"; topBtn.type = "button";
+  topBtn.setAttribute("aria-label", "Back to top"); topBtn.textContent = "\u2191";
+  document.body.appendChild(topBtn);
+  topBtn.addEventListener("click", function () { window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" }); });
+  function onScroll() {
+    var h = document.documentElement;
+    var max = h.scrollHeight - h.clientHeight;
+    bar.style.width = (max > 0 ? (h.scrollTop / max) * 100 : 0) + "%";
+    topBtn.classList.toggle("show", h.scrollTop > 600);
+  }
+  window.addEventListener("scroll", onScroll, { passive: true }); onScroll();
+  document.querySelectorAll(".reveal").forEach(function (el) {
+    var sibs = Array.prototype.filter.call(el.parentNode.children, function (c) { return c.classList && c.classList.contains("reveal"); });
+    var i = sibs.indexOf(el);
+    if (i > 0) el.style.setProperty("--reveal-delay", Math.min(i * 0.08, 0.4) + "s");
+  });
+  /* "/" focuses search; Escape clears it */
+  var search = document.getElementById("searchInput");
+  document.addEventListener("keydown", function (e) {
+    var tag = (e.target && e.target.tagName) || "";
+    if (e.key === "/" && search && tag !== "INPUT" && tag !== "TEXTAREA" && tag !== "SELECT") { e.preventDefault(); search.focus(); }
+    if (e.key === "Escape" && search && document.activeElement === search && search.value) {
+      search.value = ""; search.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+  });
 })();
